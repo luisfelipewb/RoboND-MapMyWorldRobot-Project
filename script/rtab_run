@@ -1,47 +1,31 @@
 #! /bin/bash
 
-echo ' '
-read -p 'Would you like to clear the previous map database? (y/n): ' ansinput
+read -p 'Press enter to launch Gazebo...'
+gnome-terminal --geometry 132x24 -x roslaunch slam_project my_world.launch
 
-if [ “$ansinput” = “y” ]
+read -p 'Press enter to launch Teleop...'
+gnome-terminal --geometry 50x24 -x roslaunch slam_project teleop.launch 2>/dev/null
+
+read -p 'Press enter to launch Rtab mapping...'
+gnome-terminal --geometry 132x24 -x roslaunch slam_project mapping.launch simulation:=true 2>/dev/null
+
+read -p 'Press enter to launch Rviz...'
+gnome-terminal -x roslaunch slam_project rviz.launch 2>/dev/null
+echo "Start mapping..."
+echo ""
+
+read -p 'Press enter to launch rtabmap-databaseViewer...'
+gnome-terminal -x rtabmap-databaseViewer ~/.ros/rtabmap.db
+
+read -p 'Enter the name to save the rtabmap.db (d to delete) ' FILENAME
+if [ “$FILENAME” = “d” ]
 then
- printf '\n Map deleted \n'
- rm -f ~/.ros/rtabmap.db
-
-elif [ “$ansinput” = “n” ]
-then
- printf '\n Map kept \n'
-
-else
- echo 'Warning: Not an acceptable option. Choose (y/n).
-         '
+	rm -f ~/.ros/rtabmap.db
+	echo "Map deleted" 
+else 
+	mv ~/.ros/rtabmap.db $FILENAME
+	echo "Map moved to ./$FILENAME"
 fi
 
-echo ' '
-
-read -p 'Enter target world destination or d for default: ' input_choice
-
-if [ “$input_choice” = “d” ]
-then
- x-terminal-emulator -x roslaunch slam_project world.launch world_file:=/home/nvidia/catkin_ws/src/slam_project/worlds/kitchen_dining.world 2>/dev/null &
-
-else
- x-terminal-emulator -x roslaunch slam_project world.launch world_file:=$input_choice 2>/dev/null &
-fi
-
-sleep 3 &&
-
-x-terminal-emulator -x roslaunch slam_project teleop.launch 2>/dev/null &
-
-sleep 3 &&
-
-echo ' '
-read -p 'Press any key to continue to mapping... ' -n1 -s
-
-x-terminal-emulator -x roslaunch slam_project mapping.launch simulation:=true 2>/dev/null &
-sleep 3 &&
-x-terminal-emulator -e roslaunch slam_project rviz.launch 2>/dev/null
-
-echo ' '
-echo 'Script Completed'
-echo ' '
+echo "Finished!"
+echo ""
