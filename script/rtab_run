@@ -1,7 +1,8 @@
 #! /bin/bash
 
 read -p 'Press enter to launch Gazebo...'
-gnome-terminal --geometry 132x24 -x roslaunch slam_project my_world.launch
+#gnome-terminal --geometry 132x24 -x roslaunch slam_project my_world.launch
+gnome-terminal --geometry 132x24 -x roslaunch slam_project  kitchen.launch
 
 read -p 'Press enter to launch Teleop...'
 gnome-terminal --geometry 50x24 -x roslaunch slam_project teleop.launch 2>/dev/null
